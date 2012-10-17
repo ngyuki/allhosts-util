@@ -1,0 +1,51 @@
+#!/bin/bash
+
+################################################################################
+### 全てのホストの指定されたファイルに tail -F
+################################################################################
+
+set -e
+
+function fullpath
+{
+	local F="$1"
+	
+	if [ -d "$F" ]; then
+		echo "$(cd "$F"; pwd)"
+	elif [ -f "$F" ]; then
+		echo "$(fullpath "$(dirname "$F")")/$(basename "$F")"
+	else
+		echo "no such file or dir: $F" 1>&2
+		return 1
+	fi
+}
+
+function kill_children
+{
+	pkill -P $$
+	wait
+}
+
+function main
+{
+	if [ $# -eq 0 ]; then
+		exit 1
+	fi
+	
+	trap "kill_children" EXIT
+
+	local INPUT=$(
+		for i in "$@"; do
+			fullpath "$i"
+		done
+	)
+
+	for H in $($(dirname $0)/ALLHOST)
+	do
+		ssh -tt $H tail -Fq "$INPUT" 2>/dev/null &
+	done
+
+	wait
+}
+
+main "$@"
