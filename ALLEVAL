@@ -8,7 +8,7 @@ if [ $# -eq 0 ]; then
 	exit 1
 fi
 
-for H in $($(dirname $0)/ALLHOSTS); do
+for H in $($(dirname $0)/ALLHOST); do
 	echo "# H=$H $@"
 	eval $@
 done
