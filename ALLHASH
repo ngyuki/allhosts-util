@@ -1,0 +1,51 @@
+#!/bin/bash
+
+################################################################################
+### 全てのホストの指定されたファイルの md5 ハッシュを表示
+################################################################################
+
+set -e
+
+function fullpath
+{
+	local F="$1"
+	
+	if [ -d "$F" ]; then
+		echo "$(cd "$F"; pwd)"
+	elif [ -f "$F" ]; then
+		echo "$(fullpath "$(dirname "$F")")/$(basename "$F")"
+	else
+		echo "no such file or dir: $F" 1>&2
+		return 1
+	fi
+}
+
+function main
+{
+	local INPUT=$(
+		for i in "$@"; do
+			fullpath "$i"
+		done
+	)
+
+	for H in $($(dirname $0)/ALLHOSTS); do
+		echo "$INPUT" | ssh $H '
+		
+			H=$(echo -e "\t'$H'")
+			
+			while read F; do
+				if [ -f "$F" ]; then
+					echo "$(md5sum "$F")$H"
+				elif [ -d "$F" ]; then
+					for X in $(ls "$F"); do
+						echo "$(md5sum "$F/$X")$H"
+					done
+				else
+					echo "--------------------------------  $F$H"
+				fi
+			done
+		'
+	done
+}
+
+main "$@" | sort -k 2

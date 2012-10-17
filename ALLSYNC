@@ -1,0 +1,85 @@
+#!/bin/bash
+
+################################################################################
+### 全てのホストで rsync でファイルを同期
+################################################################################
+
+# rsync バージョン 3 が必要
+
+set -e
+
+################################################################################
+# 初期化
+OPT_n=
+OPT_d=
+OPT_ls=()
+
+################################################################################
+# 引数の解析
+
+function PARSE_OPT
+{
+	local FMT="dn"
+	
+	local OPT=
+	local OPTARG=
+	
+	while :; do
+		if getopts "$FMT" OPT; then
+			if [ "$OPT" = "?" ]; then
+				exit -1
+			fi
+			eval OPT_$OPT=1
+			
+		elif [ $OPTIND -le $# ]; then	
+			eval OPTARG=\${$OPTIND}
+			OPTIND=$(( $OPTIND + 1 ))
+			
+			# ファイルパスを絶対パスに変換
+			if [ -f "$OPTARG" ]; then
+				OPTARG=$(cd $(dirname "$OPTARG"); pwd)/$(basename "$OPTARG")
+			elif [ -d "$OPTARG" ]; then
+				OPTARG=$(cd "$OPTARG"; pwd)/
+			else
+				echo "no such file or dir: $OPTARG"
+				exit -1
+			fi
+			
+			# 配列に追加
+			OPT_ls[ ${#OPT_ls[@]} ]="$OPTARG"
+			
+		else
+			break
+		fi
+	done
+}
+
+################################################################################
+# 実行
+
+function EXEC_RSYNC
+{
+	local H
+	
+	for H in $($(dirname $0)/ALLHOSTS); do
+		
+		if [ -z "$(/sbin/ip addr show to $H 2> /dev/null)" ]; then
+		
+			if [ -n "$OPT_d" ]; then
+				echo "### $H (debug)"
+				echo rsync -Rai --out-format %n --no-implied-dirs --delete "${OPT_ls[@]}" "$H":/
+			
+			elif [ -n "$OPT_n" ]; then
+				echo "### $H (dry-run)"
+				rsync -Rain --out-format %n --no-implied-dirs --delete "${OPT_ls[@]}" "$H":/
+			
+			else
+				echo "### $H"
+				rsync -Rai --out-format %n --no-implied-dirs --delete "${OPT_ls[@]}" "$H":/
+			fi
+		fi
+	done
+}
+
+PARSE_OPT "$@"
+EXEC_RSYNC
