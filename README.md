@@ -147,7 +147,7 @@ rsync はバージョン 3 以上が必要です。
 
 ### 参考
 
-`ALLTAIL`は下記のブログとGistを<s>コピペ</s>参考に作成しました。
+`ALLTAIL`は下記のブログとGistを参考に作成しました。
 
 - [tokuhirom's blog](http://blog.64p.org/entry/2012/08/24/165701)
 - [@yuya-takeyama](https://gist.github.com/3449306)
