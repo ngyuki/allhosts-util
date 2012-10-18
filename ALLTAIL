@@ -4,21 +4,9 @@
 ### 全てのホストの指定されたファイルに tail -F
 ################################################################################
 
-set -e
+source "$(dirname "$0")"/ALLHOST-functions
 
-function fullpath
-{
-	local F="$1"
-	
-	if [ -d "$F" ]; then
-		echo "$(cd "$F"; pwd)"
-	elif [ -f "$F" ]; then
-		echo "$(fullpath "$(dirname "$F")")/$(basename "$F")"
-	else
-		echo "no such file or dir: $F" 1>&2
-		return 1
-	fi
-}
+set -e
 
 function kill_children
 {
@@ -33,16 +21,17 @@ function main
 	fi
 	
 	trap "kill_children" EXIT
-
-	local INPUT=$(
+	
+	local infiles
+	infiles=$(
 		for i in "$@"; do
 			fullpath "$i"
 		done
 	)
 
-	for H in $($(dirname $0)/ALLHOST)
+	for H in $(gethosts)
 	do
-		ssh -tt $H tail -Fq "$INPUT" 2>/dev/null &
+		ssh -tt $H tail -Fq "$infiles" 2>/dev/null &
 	done
 
 	wait

@@ -4,11 +4,13 @@
 ### 全てのホストで SSH 経由でコマンド実行
 ################################################################################
 
+source "$(dirname "$0")"/ALLHOST-functions
+
 if [ $# -eq 0 ]; then
 	exit 1
 fi
 
-for H in $($(dirname $0)/ALLHOST); do
+for H in $(gethosts); do
 	echo "### ssh $H $@"
 	ssh $H "$@"
 done

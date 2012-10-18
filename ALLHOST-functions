@@ -1,0 +1,35 @@
+
+function gethosts
+{
+	if [ -z "$HOSTS" ]; then
+				
+		local dir=
+		local HOSTS=
+		
+		dir="$(dirname "$0")"
+		
+		if [ -f "$dir/ALLHOST.conf" ]; then
+			source "$dir/ALLHOST.conf"
+		elif [ -f "$dir/ALLHOST.conf.dist" ]; then
+			source "$dir/ALLHOST.conf.dist"
+		fi
+	fi
+	
+	for H in $HOSTS; do
+		echo $H
+	done
+}
+
+function fullpath
+{
+	local fn="$1"
+	
+	if [ -d "$fn" ]; then
+		echo "$(cd "$fn"; pwd)"
+	elif [ -f "$fn" ]; then
+		echo "$(fullpath "$(dirname "$fn")")/$(basename "$fn")"
+	else
+		echo "no such file or dir: $fn" 1>&2
+		return 1
+	fi
+}
