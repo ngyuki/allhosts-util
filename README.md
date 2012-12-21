@@ -9,29 +9,30 @@
 
 ## 対象ホストの指定 ##
 
-対象となるホストは環境変数`$HOSTS`で指定します。
+対象となるホストは ALLHOST.conf で次のように指定します。
 
-    $ export HOSTS="192.168.0.1 192.168.0.2 192.168.0.3 192.168.0.4"
-    $ ALLSYNC ～～～
+```bash
+HOSTS="192.168.0.1 192.168.0.2 192.168.0.3 192.168.0.4"
+```
 
-または・・・
+ALLHOST.conf が見つからない場合は ALLHOST.conf.dist が使用されます。
 
-    $ HOSTS="192.168.0.1 192.168.0.2 192.168.0.3 192.168.0.4" ALLSYNC ～～～
-
+どちらのファイルも bash の source で読み込まれるので、スクリプトっぽいことを行わせることも可能です。
 
 ## ALLHOST ##
 
-単に `$HOSTS`を出力します。
+単に対象となるホストの一覧を出力します。
 
-他の`ALL*`コマンドがホストのリストを得るために使用します。
+### 使用例
 
-そのため、このスクリプトにホストのリストをベタ書きすれば環境変数`$HOSTS`は不要です。
+    $ ALLHOST
 
-例えば、`ALLHOST`を次の通りに書き換えれば`$HOSTS`を毎度毎度設定しなくても自動的にこれらのホストが対象になります。
+### 実行結果
 
-    #!/bin/bash
-    echo "192.168.0.1 192.168.0.2 192.168.0.3 192.168.0.4"
-
+    192.168.0.1
+    192.168.0.2
+    192.168.0.3
+    192.168.0.4
 
 ## ALLEVAL ##
 
@@ -40,7 +41,7 @@
 ### 使用例
 
     $ export HOSTS="192.168.0.1 192.168.0.2 192.168.0.3 192.168.0.4"
-    $ ALLHASH echo \$H
+    $ ALLEVAL echo \$H
 
 `$H` の前の `\` は **必要** です。もしくは`ALLEVAL 'echo $H'`のようにコマンドをシングルクオートで囲います
 
@@ -145,9 +146,10 @@ rsync はバージョン 3 以上が必要です。
 
     $ ALLTAIL /var/log/httpd/access_log
 
-### 参考
+## Copyright
 
-`ALLTAIL`は下記のブログとGistを参考に作成しました。
+Copyright (c) 2012 tsyk goto <ngyuki.ts@gmail.com>
 
-- [tokuhirom's blog](http://blog.64p.org/entry/2012/08/24/165701)
-- [@yuya-takeyama](https://gist.github.com/3449306)
+## License
+
+[MIT License](http://www.opensource.org/licenses/mit-license.php)
