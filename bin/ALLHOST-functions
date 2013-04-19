@@ -2,17 +2,23 @@
 function gethosts
 {
 	if [ -z "$HOSTS" ]; then
-				
-		local dir=
+		local cwd="$(pwd)"
+		local dir="$(dirname "$0")"
+		local list=(
+			"$cwd/ALLHOST.conf"
+			"$cwd/ALLHOST.conf.dist"
+			"$dir/ALLHOST.conf"
+			"$dir/ALLHOST.conf.dist"
+		)
+		
 		local HOSTS=
 		
-		dir="$(dirname "$0")"
-		
-		if [ -f "$dir/ALLHOST.conf" ]; then
-			source "$dir/ALLHOST.conf"
-		elif [ -f "$dir/ALLHOST.conf.dist" ]; then
-			source "$dir/ALLHOST.conf.dist"
-		fi
+		for fn in "${list[@]}"; do
+			if [ -f "$fn" ]; then
+				source "$fn"
+				break
+			fi
+		done
 	fi
 	
 	for H in $HOSTS; do
