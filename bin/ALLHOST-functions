@@ -10,9 +10,9 @@ function gethosts
 			"$dir/ALLHOST.conf"
 			"$dir/ALLHOST.conf.dist"
 		)
-		
+
 		local HOSTS=
-		
+
 		for fn in "${list[@]}"; do
 			if [ -f "$fn" ]; then
 				source "$fn"
@@ -20,7 +20,7 @@ function gethosts
 			fi
 		done
 	fi
-	
+
 	for H in $HOSTS; do
 		echo $H
 	done
@@ -29,7 +29,7 @@ function gethosts
 function fullpath
 {
 	local fn="$1"
-	
+
 	if [ -d "$fn" ]; then
 		echo "$(cd "$fn"; pwd)"
 	elif [ -f "$fn" ]; then
@@ -38,4 +38,11 @@ function fullpath
 		echo "no such file or dir: $fn" 1>&2
 		return 1
 	fi
+}
+
+function headline
+{
+	tput setab 1
+	printf "%-$(tput cols)s\n" "# $*"
+	tput sgr0
 }

@@ -21,31 +21,31 @@ opt_ls=()
 function parse_option
 {
 	local fmt="dn"
-	
+
 	local OPT=
 	local OPTARG=
-	
+
 	while :; do
 		if getopts "$fmt" OPT; then
-			
+
 			if [ "$OPT" = "?" ]; then
 				exit -1
 			fi
-			
+
 			eval opt_$OPT=1
-			
-		elif [ $OPTIND -le $# ]; then	
+
+		elif [ $OPTIND -le $# ]; then
 			eval OPTARG=\${$OPTIND}
 			OPTIND=$(( $OPTIND + 1 ))
-			
+
 			OPTARG=$(fullpath "$OPTARG")
-			
+
 			if [ -d "$OPTARG" ]; then
 				OPTARG="$OPTARG/"
 			fi
-			
+
 			opt_ls[ ${#opt_ls[@]} ]="$OPTARG"
-			
+
 		else
 			break
 		fi
@@ -58,21 +58,21 @@ function parse_option
 function execute_rsync
 {
 	local H
-	
+
 	for H in $(gethosts); do
-		
+
 		if [ -z "$(/sbin/ip addr show to $H 2> /dev/null)" ]; then
-		
+
 			if [ -n "$opt_d" ]; then
-				echo "### $H (debug)"
+				headline "$H (debug)"
 				echo rsync -Rai --out-format %n --no-implied-dirs --delete "${opt_ls[@]}" "$H":/
-			
+
 			elif [ -n "$opt_n" ]; then
-				echo "### $H (dry-run)"
+				headline "$H (dry-run)"
 				rsync -Rain --out-format %n --no-implied-dirs --delete "${opt_ls[@]}" "$H":/
-			
+
 			else
-				echo "### $H"
+				headline "$H"
 				rsync -Rai --out-format %n --no-implied-dirs --delete "${opt_ls[@]}" "$H":/
 			fi
 		fi

@@ -11,6 +11,6 @@ if [ $# -eq 0 ]; then
 fi
 
 for H in $(gethosts); do
-	echo "# H=$H $@"
-	eval $@
+    headline "H=$H $@"
+    eval $@
 done

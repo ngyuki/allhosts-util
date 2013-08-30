@@ -11,6 +11,6 @@ if [ $# -eq 0 ]; then
 fi
 
 for H in $(gethosts); do
-	echo "### ssh $H $@"
-	ssh $H "$@"
+    headline "ssh $H $@"
+    ssh $H "$@"
 done
