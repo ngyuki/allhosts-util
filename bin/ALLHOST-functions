@@ -42,7 +42,5 @@ function fullpath
 
 function headline
 {
-	tput setab 1
-	printf "%-$(tput cols)s\n" "# $*"
-	tput sgr0
+	printf "%s%-$(tput cols)s%s\n" "$(tput setab 1)" "# $*" "$(tput sgr0)"
 }
